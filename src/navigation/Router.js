@@ -37,6 +37,7 @@ const TabScreens = () => {
   return (
     <Tab.Navigator tabBar={props => <TabBar {...props} />}>
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   )
 }
@@ -58,13 +59,8 @@ const Router = ({
       <Stack.Navigator initialRouteName={user.isAuth ? initialAuthRoute : initialRouteName}>
         {user.isAuth ?
           <>
-            <Stack.Screen
-              options={props => getHeaderOptions({ ...props, user })}
-              name="Home"
-              component={TabScreens}
-            />
+            <Stack.Screen options={props => getHeaderOptions({ ...props, user })} name="TabScreens" component={TabScreens} />
             <Stack.Screen options={props => getHeaderOptions({ ...props, user })} name="Spot" component={SpotScreen} />
-            <Stack.Screen options={props => getHeaderOptions({ ...props, user })} name="Profile" component={ProfileScreen} />
           </>
           :
           <>

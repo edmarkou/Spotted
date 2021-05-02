@@ -6,7 +6,7 @@ import { makeAuthRequest } from './helpers/fetch';
 import { removeUserSession } from './helpers/userSessionHelper';
 import { initiateSocket } from './context/socketContext';
 import { initLocationServices } from './helpers/locationHelper';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import style from './styles/global';
 
 const App = ({
@@ -46,7 +46,9 @@ const App = ({
 
     return (
         <SafeAreaView style={style.main_container}>
-            <Router locationGranted={locationGranted} />
+            <KeyboardAvoidingView style={style.main_container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                <Router locationGranted={locationGranted} />
+            </KeyboardAvoidingView>
         </SafeAreaView>
 
     );

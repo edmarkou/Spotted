@@ -11,6 +11,10 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         padding: 10
     },
+    flex_end: {
+        flex: 1,
+        justifyContent: 'flex-end'
+    },
     home_container: {
         flex: 1,
         alignItems: 'center'

@@ -11,8 +11,13 @@ const Input = ({
     showError = false,
     errorMessage,
     onChangeText = () => null,
+    onBlur = () => null,
+    onFocus = () => null,
     placeholder = 'Placeholder',
-    disabled = false
+    disabled = false,
+    multiline = false,
+    maxLength,
+    numberOfLines
 }) => {
     const [input, setInput] = useState(text);
 
@@ -24,6 +29,8 @@ const Input = ({
     return (
         <>
             <TextInput
+                onBlur={onBlur}
+                onFocus={onFocus}
                 placeholderTextColor={PLACEHOLDER_COLOR}
                 disabled={disabled}
                 placeholder={placeholder}
@@ -31,6 +38,9 @@ const Input = ({
                 style={!showError ? { ...style.text_input, ...inputStyle } : { ...style.text_input, ...inputStyle, borderColor: ERROR_COLOR }}
                 onChangeText={updateInput}
                 value={input}
+                multiline={multiline}
+                maxLength={maxLength}
+                numberOfLines={numberOfLines}
             />
             {showError && <Text style={style.error_text}>{errorMessage}</Text>}
         </>

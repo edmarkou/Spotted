@@ -4,8 +4,11 @@ import { connect } from 'react-redux';
 import { makeAuthRequest } from '../helpers/fetch';
 import style from '../styles/global';
 import { updateAuthorization } from '../actions/userActions';
-import MapView, { Marker } from 'react-native-maps'; // add PROVIDER_GOOGLE import if using Google Maps
+import MapView, { Marker, Callout } from 'react-native-maps'; // add PROVIDER_GOOGLE import if using Google Maps
 import { getLocation } from '../helpers/locationHelper';
+import SpotCallout from '../components/SpotCallout';
+import Modal from 'react-native-modal';
+import BottomHalfModal from '../components/BottomHalfModal';
 
 const styles = StyleSheet.create({
     map: {
@@ -20,6 +23,7 @@ const HomeScreen = ({
 }) => {
     const [currLocation, setLocation] = useState(null);
     const [spots, setSpots] = useState([]);
+    const [coordinates, setCoords] = useState([]);
 
     useEffect(() => {
         getLocation().then(location => {
@@ -47,18 +51,16 @@ const HomeScreen = ({
             });
     }
 
-    const createSpot = (e) => {
-        const spot = {
-            title: 'test',
-            description: 'test test test',
-            location: {
-                type: 'Point',
-                coordinates: [e.nativeEvent.coordinate.longitude, e.nativeEvent.coordinate.latitude]
-            },
-            image: 'https://lh3.googleusercontent.com/proxy/KH2XaHU9C6kfFdkeEQfW9SDdnotvE8qs4Ygk7OFivMLMNyUbYbEaGBIWzN7vtfuGar2LsgmIY1A9G-GV53XQEsWkxN4PeJlfkkXElRpc_fzEsGuJUPZhi__zi2ye5neBjvcwJgN1fbvcbLIfrazrXY4FvVdCZhwCsQ00nVPos1uT6DJmNQ',
-            size: 'SMALL',
-            type: 'SKATEPARK',
-        };
+    const openSpotCreation = (e) => {
+        setCoords([e.nativeEvent.coordinate.longitude, e.nativeEvent.coordinate.latitude]);
+    };
+
+    const navigateToSpot = (spot) => {
+        navigation.navigate('Spot', { spot });
+    }
+
+    const createSpot = (data) => {
+        const spot = { ...data, location: { type: 'Point', coordinates } };
         makeAuthRequest(`http://localhost:5000/spots/create`, spot, 'POST')
             .then(res => {
                 if (res.success) {
@@ -67,40 +69,45 @@ const HomeScreen = ({
                     console.warn(res.message);
                 }
             });
-    };
-
-    const navigateToSpot = (spot) => {
-        navigation.navigate('Spot', { spot });
+        setCoords([]);
     }
 
     return (
         <View style={style.home_container}>
-            <View style={{ width: '100%', height: '80%' }}>
-                {currLocation &&
-                    <MapView
-                        // provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                        style={styles.map}
-                        initialRegion={currLocation}
-                        showsUserLocation
-                        onPress={createSpot}
-                    >
-                        {spots.map((spot, i) => (
-                            <Marker
-                                key={i}
-                                title={spot.title}
-                                description={spot.description}
-                                coordinate={{
-                                    longitude: spot.location.coordinates[0],
-                                    latitude: spot.location.coordinates[1]
-                                }}
-                                identifier={spot._id}
-                                tracksViewChanges={false}
-                                onCalloutPress={() => navigateToSpot(spot)}
-                            />
-                        ))}
-                    </MapView>
-                }
-            </View>
+            {currLocation &&
+                <MapView
+                    // provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+                    style={styles.map}
+                    initialRegion={currLocation}
+                    showsUserLocation
+                    onPress={openSpotCreation}
+                >
+                    {spots.map((spot, i) => (
+                        <Marker
+                            key={i}
+                            title={spot.title}
+                            description={spot.description}
+                            coordinate={{
+                                longitude: spot.location.coordinates[0],
+                                latitude: spot.location.coordinates[1]
+                            }}
+                            onPress={e => e.stopPropagation()}
+                            identifier={spot._id}
+                            tracksViewChanges={false}
+                            onCalloutPress={() => navigateToSpot(spot)}
+                        >
+                            <Callout>
+                                <SpotCallout spot={spot} />
+                            </Callout>
+                        </Marker>
+                    ))}
+                </MapView>
+            }
+            <BottomHalfModal
+                onSubmit={createSpot}
+                isVisible={!!coordinates.length}
+                onClose={() => setCoords([])}
+            />
         </View>
     );
 };

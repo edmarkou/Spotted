@@ -24,3 +24,13 @@ export const validateSecondRegistration = data => {
         image: Joi.string().uri(),
     }).validate(data);
 };
+
+export const validateSpot = data => {
+    return Joi.object({
+        title: Joi.string().min(3).max(50).required(),
+        description: Joi.string().min(3).max(500).required(),
+        size: Joi.string().allow('SKATEPARK', 'STAIR_SETS', 'RAILS', 'LEDGES', 'GAPS').required(),
+        type: Joi.string().allow('SMALL', 'MEDIUM', 'LARGE').required(),
+        image: Joi.string().uri(),
+    }).validate(data);
+};
