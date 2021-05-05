@@ -30,7 +30,7 @@ const Login = ({
         } else {
             setError({});
             setLoading(true);
-            makeRequest(`http://localhost:5000/users/login`, { email, password }, 'POST')
+            makeRequest(`http://192.168.1.234:5000/users/login`, { email, password }, 'POST')
                 .then(res => {
                     if (res.success) {
                         storeUserSession({ token: res.token, ...res.user });

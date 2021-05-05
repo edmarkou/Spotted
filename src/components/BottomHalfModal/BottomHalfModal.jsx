@@ -6,8 +6,6 @@ import { DEFAULT_LINEAR_COLORS } from '../../styles/constants';
 import style from './style';
 import global from './../../styles/global';
 import Input from '../Input';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { uploadToS3 } from '../../helpers/aws';
 import LinearButton from '../LinearButton';
 import { SPOT_TYPES, SIZE_TYPES } from '../../constants';
 import { validateSpot } from '../../helpers/validator';
@@ -43,23 +41,8 @@ export const BottomHalfModal = ({
         if (Object.keys(errors).length) setErrors({});
     }, [spot]);
 
-    const openGallery = () => {
-        launchImageLibrary({
-            mediaType: 'photo',
-            quality: 0.1
-        }, res => {
-            if (!res.didCancel) {
-                const source = {
-                    uri: res.uri,
-                    type: res.type,
-                    name: res.fileName,
-                };
-                setSpot({ ...spot, image: res.uri });
-                uploadToS3(source, data => {
-                    setSpot({ ...spot, image: data.Location });
-                });
-            }
-        });
+    const onLoadImage = (data) => {
+        setSpot({ ...spot, image: data.image });
     }
 
     const disableModal = () => setFocus(true);
@@ -116,12 +99,13 @@ export const BottomHalfModal = ({
                                 inputStyle={{ height: 100 }}
                             />
                             <ImagePicker
+                                onLoad={onLoadImage}
+                                setLoading={setLoading}
                                 placeholder={'Image required'}
-                                openCamera={openGallery}
-                                openGallery={openGallery}
                                 image={spot.image}
                                 showError={!!errors['image']}
                                 errorMessage={errors['image']}
+                                loading={loading}
                             />
                             <Picker
                                 onOpen={disableModal}
@@ -137,8 +121,8 @@ export const BottomHalfModal = ({
                                 items={SIZE_TYPES}
                                 value={spot.size}
                             />
-                            <LinearButton onPress={submit} disabled={Object.keys(errors).length}>
-                                <Text style={global.button_white_text}>Create spot</Text>
+                            <LinearButton onPress={submit} disabled={Object.keys(errors).length || loading}>
+                                {loading ? <ActivityIndicator /> : <Text style={global.button_white_text}>Create spot</Text>}
                             </LinearButton>
                         </ScrollView>
                     </SafeAreaView>

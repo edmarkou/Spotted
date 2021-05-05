@@ -13,7 +13,7 @@ const Logout = ({
 }) => {
 
     const logout = () => {
-        makeAuthRequest('http://localhost:5000/users/logout')
+        makeAuthRequest('http://192.168.1.234:5000/users/logout')
             .then(() => {
                 updateAuthorization(false);
                 removeUserSession();

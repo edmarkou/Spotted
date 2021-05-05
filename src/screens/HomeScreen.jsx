@@ -41,7 +41,7 @@ const HomeScreen = ({
     }, [currLocation]);
 
     const getSpots = () => {
-        makeAuthRequest(`http://localhost:5000/spots/get`)
+        makeAuthRequest(`http://192.168.1.234:5000/spots/get`)
             .then(res => {
                 if (res.success) {
                     setSpots(res.spots);
@@ -61,7 +61,7 @@ const HomeScreen = ({
 
     const createSpot = (data) => {
         const spot = { ...data, location: { type: 'Point', coordinates } };
-        makeAuthRequest(`http://localhost:5000/spots/create`, spot, 'POST')
+        makeAuthRequest(`http://192.168.1.234:5000/spots/create`, spot, 'POST')
             .then(res => {
                 if (res.success) {
                     setSpots([...spots, res.spot]);

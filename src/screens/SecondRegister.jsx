@@ -15,7 +15,6 @@ import profileIcon from '../assets/images/profile.png';
 
 const SecondRegister = ({
     updateAuthorization,
-    navigation,
     route
 }) => {
     const [firstName, setFirstName] = useState('');
@@ -23,6 +22,7 @@ const SecondRegister = ({
     const [username, setUserName] = useState('');
     const [image, setImage] = useState('');
     const [errors, setError] = useState({});
+    const [loadingImage, setLoadingImage] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const onSubmit = () => {
@@ -34,7 +34,7 @@ const SecondRegister = ({
         } else {
             setError({});
             setLoading(true);
-            makeRequest(`http://localhost:5000/users/register`,
+            makeRequest(`http://192.168.1.234:5000/users/register`,
                 {
                     email: route.params.email,
                     password: route.params.pass,
@@ -62,10 +62,39 @@ const SecondRegister = ({
         }
     }
 
+    const openCamera = () => {
+        launchCamera({
+            maxHeight: 1000,
+            maxWidth: 1000,
+            mediaType: 'photo',
+            quality: 0.1,
+            cameraType: 'back',
+            saveToPhotos: true,
+        }, res => {
+            if (res.errorCode === "camera_unavailable") {
+                console.log('camera unavailable')
+            } else if (!res.didCancel) {
+                const source = {
+                    uri: res.uri,
+                    type: res.type,
+                    name: res.fileName,
+                };
+                setImage(res.uri);
+                setLoadingImage(true);
+                uploadToS3(source, data => {
+                    setImage(data.Location);
+                    setLoadingImage(false);
+                });
+            }
+        });
+    }
+
     const openGallery = () => {
         launchImageLibrary({
+            maxHeight: 1000,
+            maxWidth: 1000,
             mediaType: 'photo',
-            quality: 0.1
+            quality: 0.1,
         }, res => {
             if (!res.didCancel) {
                 const source = {
@@ -74,8 +103,10 @@ const SecondRegister = ({
                     name: res.fileName,
                 };
                 setImage(res.uri);
+                setLoadingImage(true);
                 uploadToS3(source, data => {
                     setImage(data.Location);
+                    setLoadingImage(false);
                 });
             }
         });
@@ -85,6 +116,7 @@ const SecondRegister = ({
         <View style={style.flex_top}>
             <View style={style.avatar_container}>
                 <Image style={style.avatar_big} source={image ? { uri: image } : profileIcon} />
+                {loadingImage && <ActivityIndicator style={{ position: 'absolute' }} />}
             </View>
             <View style={style.center_horizontal}>
                 <LinearButton
@@ -96,7 +128,7 @@ const SecondRegister = ({
                 </LinearButton>
                 <LinearButton
                     buttonStyle={style.small_button_container}
-                    onPress={openGallery}
+                    onPress={openCamera}
                     gradientStyle={style.small_gradient_button}
                 >
                     <Text style={style.button_white_text_little}>Camera</Text>
@@ -126,7 +158,7 @@ const SecondRegister = ({
                 text={username}
                 onChangeText={setUserName}
             />
-            <LinearButton onPress={onSubmit} disabled={loading}>
+            <LinearButton onPress={onSubmit} disabled={loading || loadingImage}>
                 {loading ? <ActivityIndicator /> : <Text style={style.button_white_text}>Sign up</Text>}
             </LinearButton>
         </View>

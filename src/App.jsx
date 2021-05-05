@@ -26,7 +26,7 @@ const App = ({
     }, []);
 
     useEffect(() => {
-        makeAuthRequest('http://localhost:5000/users/auth')
+        makeAuthRequest('http://192.168.1.234:5000/users/auth')
             .then(res => {
                 if (!res.success) {
                     removeUserSession()

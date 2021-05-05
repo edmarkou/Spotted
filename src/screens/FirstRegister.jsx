@@ -27,7 +27,7 @@ const FirstRegister = ({
         } else {
             setError({});
             setLoading(true);
-            makeRequest(`http://localhost:5000/users/check-email`, { email }, "POST").then(res => {
+            makeRequest(`http://192.168.1.234:5000/users/check-email`, { email }, "POST").then(res => {
                 if (res.success) {
                     if (res.userExists) {
                         setError({ email: res.message });

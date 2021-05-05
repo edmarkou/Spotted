@@ -1,29 +1,83 @@
 import React from 'react';
-import { Image, View, Text, StyleSheet } from 'react-native';
+import { Image, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { PLACEHOLDER_COLOR, PRIMARY_COLOR } from '../../../styles/constants';
 import global from '../../../styles/global';
 import { ERROR_COLOR } from '../../../styles/constants';
 import LinearButton from '../../LinearButton';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { uploadToS3 } from '../../../helpers/aws';
 
 const ImagePicker = ({
     image,
-    openCamera,
-    openGallery,
     placeholder,
     errorMessage,
-    showError
+    showError,
+    loading,
+    setLoading,
+    onLoad
 }) => {
+
+    const openGallery = () => {
+        launchImageLibrary({
+            mediaType: 'photo',
+            maxHeight: 1000,
+            maxWidth: 1000,
+            quality: 0.1
+        }, res => {
+            if (!res.didCancel) {
+                const source = {
+                    uri: res.uri,
+                    type: res.type,
+                    name: res.fileName,
+                };
+                onLoad({ image: res.uri });
+                setLoading(true);
+                uploadToS3(source, data => {
+                    onLoad({ image: data.Location });
+                    setLoading(false);
+                });
+            }
+        });
+    }
+
+    const openCamera = () => {
+        launchCamera({
+            maxHeight: 1000,
+            maxWidth: 1000,
+            mediaType: 'photo',
+            quality: 0.1,
+            cameraType: 'back',
+            saveToPhotos: true,
+        }, res => {
+            if (res.errorCode === "camera_unavailable") {
+                console.log('camera unavailable')
+            } else if (!res.didCancel) {
+                const source = {
+                    uri: res.uri,
+                    type: res.type,
+                    name: res.fileName,
+                };
+                onLoad({ image: res.uri });
+                setLoading(true);
+                uploadToS3(source, data => {
+                    onLoad({ image: data.Location });
+                    setLoading(false);
+                });
+            }
+        });
+    }
+
     return (
         <View style={style.image_picker_container}>
             <View
                 style={{ ...style.spot_image_container, borderColor: showError ? ERROR_COLOR : PRIMARY_COLOR }}
             >
-                {image ?
-                    <Image style={style.spot_image} source={{ uri: image }} />
+                {image ? <Image style={style.spot_image} source={{ uri: image }} />
                     :
                     <Text style={showError ? style.error : style.placeholder}>
                         {showError ? errorMessage : placeholder}
                     </Text>}
+                {loading && <ActivityIndicator style={{ position: 'absolute' }} />}
             </View>
             <View style={style.spot_image_button_container}>
                 <LinearButton
