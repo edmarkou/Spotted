@@ -8,7 +8,6 @@ import com.BV.LinearGradient.LinearGradientPackage;
 import com.rnfs.RNFSPackage;
 import com.github.reactnativecommunity.location.RNLocationPackage;
 import com.github.reactnativecommunity.location.RNLocationPackage;
-import com.reactnativecommunity.cookies.CookieManagerPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;

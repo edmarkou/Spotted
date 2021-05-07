@@ -17,9 +17,9 @@ const style = StyleSheet.create({
         maxHeight: '75%'
     },
     scrollview: {
-        width: '100%',
         paddingLeft: 10,
-        paddingRight: 10
+        paddingRight: 10,
+        flexGrow: 1
     },
     notch: {
         alignSelf: 'center',

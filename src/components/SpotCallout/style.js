@@ -2,16 +2,19 @@ import { StyleSheet } from 'react-native';
 
 const style = StyleSheet.create({
     container: {
-        width: 200,
-        flexDirection: 'row',
         alignItems: 'center',
-        flexWrap: 'wrap',
         justifyContent: 'center'
     },
     image: {
-        width: 100,
-        height: 80,
+        width: 80,
+        height: 60,
         borderRadius: 5
+    },
+    title: {
+        marginTop: 10,
+        fontSize: 14,
+        fontWeight: "400",
+        textAlign: 'center'
     }
 });
 

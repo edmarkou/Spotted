@@ -8,6 +8,6 @@ export const SPOT_TYPES = [
 ];
 export const SIZE_TYPES = [
     { label: 'Medium (100m)', value: 'MEDIUM', key: 'MEDIUM' },
-    { label: 'Small (25m)', value: 'SMALL', key: 'SMALL' },
+    { label: 'Small (50m)', value: 'SMALL', key: 'SMALL' },
     { label: 'Large (250m)', value: 'LARGE', key: 'LARGE' },
 ];

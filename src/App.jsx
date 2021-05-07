@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { updateAuthorization } from './actions/userActions';
 import { makeAuthRequest } from './helpers/fetch';
 import { removeUserSession } from './helpers/userSessionHelper';
-import { initiateSocket } from './context/socketContext';
 import { initLocationServices } from './helpers/locationHelper';
 import { SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import style from './styles/global';
@@ -15,7 +14,6 @@ const App = ({
     const [locationGranted, setLocationPermission] = useState(false);
 
     useEffect(() => {
-        initiateSocket();
         initLocationServices().then(initiated => {
             setLocationPermission(initiated);
             if (!initiated) {
