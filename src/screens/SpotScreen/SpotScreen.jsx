@@ -32,7 +32,7 @@ const Spot = ({
     }, []);
 
     const getRadius = size => {
-        const radius = { MEDIUM: 100, SMALL: 100, LARGE: 250 };
+        const radius = { MEDIUM: 150, SMALL: 100, LARGE: 250 };
         return radius[size];
     }
 

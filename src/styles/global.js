@@ -134,6 +134,7 @@ const style = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
+        marginBottom: 10,
         backgroundColor: '#fff'
     },
     avatar_small: {
@@ -141,7 +142,11 @@ const style = StyleSheet.create({
         height: 34,
         borderRadius: 17,
         resizeMode: 'cover'
-    }
+    },
+    map: {
+        width: '100%',
+        height: '100%'
+    },
 });
 
 export default style;

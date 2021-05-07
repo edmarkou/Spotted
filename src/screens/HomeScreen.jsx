@@ -4,22 +4,13 @@ import { connect } from 'react-redux';
 import { makeAuthRequest } from '../helpers/fetch';
 import style from '../styles/global';
 import { updateAuthorization } from '../actions/userActions';
-import MapView, { Marker, Callout, Circle, PROVIDER_GOOGLE } from 'react-native-maps'; // add PROVIDER_GOOGLE import if using Google Maps
+import MapView, { Marker, Callout, Circle } from 'react-native-maps';
 import { getLocation, getDistanceBetween } from '../helpers/locationHelper';
 import SpotCallout from '../components/SpotCallout';
 import BottomHalfModal from '../components/BottomHalfModal';
 import useMapSocket from '../context/useMapSocket';
-import pointerSmallIcon from '../assets/images/pointer_small.png';
-import pointerMediumIcon from '../assets/images/pointer_medium.png';
-import pointerLargeIcon from '../assets/images/pointer_large.png';
-import { PRIMARY_COLOR } from '../styles/constants';
-
-const styles = StyleSheet.create({
-    map: {
-        width: '100%',
-        height: '100%'
-    },
-});
+import { LOCATION_TYPE_COLORS } from '../styles/constants';
+import AlertModal from '../components/AlertModal';
 
 const HomeScreen = ({
     navigation,
@@ -28,6 +19,7 @@ const HomeScreen = ({
     const [currLocation, setLocation] = useState(null);
     const [spots, setSpots] = useState([]);
     const [coordinates, setCoords] = useState([]);
+    const [showAlert, setAlert] = useState(false);
 
     const getSpots = () => {
         makeAuthRequest(`http://192.168.1.234:5000/spots/get`)
@@ -44,7 +36,6 @@ const HomeScreen = ({
 
     useEffect(() => {
         getLocation().then(location => {
-            console.log(location)
             setLocation({
                 latitude: location.latitude,
                 longitude: location.longitude,
@@ -59,7 +50,19 @@ const HomeScreen = ({
     }, [currLocation]);
 
     const openSpotCreation = (e) => {
-        setCoords([e.nativeEvent.coordinate.longitude, e.nativeEvent.coordinate.latitude]);
+        if (e.nativeEvent.coordinate) {
+            const index = spots.findIndex(spot => (
+                getDistanceBetween(
+                    e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude,
+                    spot.location.coordinates[1], spot.location.coordinates[0]
+                ) < getRadius(spot.size) + 50
+            ))
+            if (index === -1) {
+                setCoords([e.nativeEvent.coordinate.longitude, e.nativeEvent.coordinate.latitude]);
+            } else {
+                setAlert(true);
+            }
+        }
     };
 
     const navigateToSpot = (spot) => {
@@ -80,23 +83,25 @@ const HomeScreen = ({
     }
 
     const onUserLocationChange = (e) => {
-        if (getDistanceBetween(
-            e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude,
-            currLocation.latitude, currLocation.longitude
-        ) > 500) {
-            getLocation().then(location => {
-                setLocation({
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05
+        if (e.nativeEvent.coordinate) {
+            if (getDistanceBetween(
+                e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude,
+                currLocation.latitude, currLocation.longitude
+            ) > 500) {
+                getLocation().then(location => {
+                    setLocation({
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        latitudeDelta: 0.05,
+                        longitudeDelta: 0.05
+                    });
                 });
-            });
+            }
         }
     }
 
     const getRadius = size => {
-        const radius = { MEDIUM: 100, SMALL: 50, LARGE: 250 };
+        const radius = { MEDIUM: 100, SMALL: 50, LARGE: 200 };
         return radius[size];
     }
 
@@ -104,8 +109,7 @@ const HomeScreen = ({
         <View style={style.home_container}>
             {currLocation &&
                 <MapView
-                    // provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                    style={styles.map}
+                    style={style.map}
                     initialRegion={currLocation}
                     showsUserLocation
                     onUserLocationChange={onUserLocationChange}
@@ -133,8 +137,8 @@ const HomeScreen = ({
                     {spots.map((spot, i) => (
                         <Circle
                             zIndex={-1}
-                            strokeColor={PRIMARY_COLOR}
-                            fillColor={PRIMARY_COLOR}
+                            strokeColor={LOCATION_TYPE_COLORS[spot.type]}
+                            fillColor={LOCATION_TYPE_COLORS[spot.type]}
                             key={i}
                             radius={getRadius(spot.size)}
                             center={{
@@ -149,6 +153,11 @@ const HomeScreen = ({
                 onSubmit={createSpot}
                 isVisible={!!coordinates.length}
                 onClose={() => setCoords([])}
+            />
+            <AlertModal
+                isVisible={showAlert}
+                text={"You can't create a new location where there is already a spot. Add a spot outside of the location bubbles."}
+                closeModal={() => setAlert(false)}
             />
         </View>
     );

@@ -13,7 +13,6 @@ const style = StyleSheet.create({
         height: 300,
     },
     info_container: {
-        // flex: 1,
         padding: 10,
         flexGrow: 1
     },
