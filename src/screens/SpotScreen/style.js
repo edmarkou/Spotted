@@ -33,6 +33,10 @@ const style = StyleSheet.create({
         marginBottom: 10,
         fontSize: 16,
         fontWeight: '300'
+    },
+    userSpotContainer: {
+        marginTop: 10,
+        width: '100%',
     }
 });
 

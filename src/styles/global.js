@@ -2,16 +2,27 @@ import { StyleSheet } from 'react-native';
 import { ERROR_COLOR } from './constants';
 
 const style = StyleSheet.create({
+    scrolview_flex_all: {
+        flex: 1,
+        flexGrow: 1,
+    },
+    keyboard_avoiding_view: {
+        width: '100%',
+        alignItems: 'center'
+    },
     main_container: {
-        flex: 1
+        flex: 1,
+        flexGrow: 1,
     },
     flex_center: {
+        flexGrow: 1,
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10
     },
     flex_end: {
+        flexGrow: 1,
         flex: 1,
         justifyContent: 'flex-end'
     },

@@ -22,6 +22,18 @@ export const validateSecondRegistration = data => {
         lastName: Joi.string().min(2).max(100).required(),
         username: Joi.string().min(2).max(30).required(),
         image: Joi.string().uri(),
+        type: Joi.string().allow('BMX', 'SKATE', 'SCOOTER', 'BLADES').required()
+    }).validate(data);
+};
+
+export const validateProfile = data => {
+    return Joi.object({
+        firstName: Joi.string().min(2).max(100).required(),
+        lastName: Joi.string().min(2).max(100).required(),
+        username: Joi.string().min(2).max(30).required(),
+        image: Joi.string().uri(),
+        type: Joi.string().allow('BMX', 'SKATE', 'SCOOTER', 'BLADES').required(),
+        description: Joi.string().max(300).allow(''),
     }).validate(data);
 };
 

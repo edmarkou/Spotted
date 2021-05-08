@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, Image } from 'react-native';
+import { View, Text, ActivityIndicator, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import { useState } from 'react/cjs/react.development';
 import { updateAuthorization } from '../actions/userActions';
@@ -12,6 +12,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { uploadToS3 } from '../helpers/aws';
 import LinearButton from '../components/LinearButton';
 import profileIcon from '../assets/images/profile.png';
+import Picker from '../components/Picker';
+import { USER_TYPES } from '../constants';
 
 const SecondRegister = ({
     updateAuthorization,
@@ -24,6 +26,7 @@ const SecondRegister = ({
     const [errors, setError] = useState({});
     const [loadingImage, setLoadingImage] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [type, setType] = useState(USER_TYPES[0].value);
 
     const onSubmit = () => {
         const { error } = validateSecondRegistration({ firstName, lastName, username, image });
@@ -41,7 +44,8 @@ const SecondRegister = ({
                     firstName,
                     lastName,
                     username,
-                    image
+                    image,
+                    type
                 },
                 'POST')
                 .then(res => {
@@ -67,7 +71,7 @@ const SecondRegister = ({
             maxHeight: 1000,
             maxWidth: 1000,
             mediaType: 'photo',
-            quality: 0.1,
+            quality: 0.5,
             cameraType: 'back',
             saveToPhotos: true,
         }, res => {
@@ -94,7 +98,7 @@ const SecondRegister = ({
             maxHeight: 1000,
             maxWidth: 1000,
             mediaType: 'photo',
-            quality: 0.1,
+            quality: 0.5,
         }, res => {
             if (!res.didCancel) {
                 const source = {
@@ -113,55 +117,64 @@ const SecondRegister = ({
     }
 
     return (
-        <View style={style.flex_top}>
-            <View style={style.avatar_container}>
-                <Image style={style.avatar_big} source={image ? { uri: image } : profileIcon} />
-                {loadingImage && <ActivityIndicator style={{ position: 'absolute' }} />}
+        <ScrollView contentContainerStyle={style.scrolview_flex_all}>
+            <View style={style.flex_top}>
+                <KeyboardAvoidingView style={style.keyboard_avoiding_view} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                    <View style={style.avatar_container}>
+                        <Image style={style.avatar_big} source={image ? { uri: image } : profileIcon} />
+                        {loadingImage && <ActivityIndicator style={{ position: 'absolute' }} />}
+                    </View>
+                    <View style={style.center_horizontal}>
+                        <LinearButton
+                            buttonStyle={style.small_button_container}
+                            onPress={openGallery}
+                            gradientStyle={style.small_gradient_button}
+                        >
+                            <Text style={style.button_white_text_little}>Gallery</Text>
+                        </LinearButton>
+                        <LinearButton
+                            buttonStyle={style.small_button_container}
+                            onPress={openCamera}
+                            gradientStyle={style.small_gradient_button}
+                        >
+                            <Text style={style.button_white_text_little}>Camera</Text>
+                        </LinearButton>
+                    </View>
+                    <Input
+                        disabled={loading}
+                        placeholder={"User name"}
+                        showError={!!errors['username']}
+                        errorMessage={errors['username']}
+                        text={username}
+                        onChangeText={setUserName}
+                    />
+                    <Input
+                        disabled={loading}
+                        placeholder={"First name"}
+                        text={firstName}
+                        onChangeText={setFirstName}
+                        showError={!!errors['firstName']}
+                        errorMessage={errors['firstName']}
+                    />
+                    <Input
+                        disabled={loading}
+                        placeholder={"Last name"}
+                        showError={!!errors['lastName']}
+                        errorMessage={errors['lastName']}
+                        text={lastName}
+                        onChangeText={setLastName}
+                    />
+                    <Picker
+                        onValueChange={type => setType(type)}
+                        items={USER_TYPES}
+                        value={type}
+                    />
+                    <LinearButton onPress={onSubmit} disabled={loading || loadingImage}>
+                        {loading ? <ActivityIndicator /> : <Text style={style.button_white_text}>Sign up</Text>}
+                    </LinearButton>
+                </KeyboardAvoidingView>
             </View>
-            <View style={style.center_horizontal}>
-                <LinearButton
-                    buttonStyle={style.small_button_container}
-                    onPress={openGallery}
-                    gradientStyle={style.small_gradient_button}
-                >
-                    <Text style={style.button_white_text_little}>Gallery</Text>
-                </LinearButton>
-                <LinearButton
-                    buttonStyle={style.small_button_container}
-                    onPress={openCamera}
-                    gradientStyle={style.small_gradient_button}
-                >
-                    <Text style={style.button_white_text_little}>Camera</Text>
-                </LinearButton>
-            </View>
-            <Input
-                disabled={loading}
-                placeholder={"First name"}
-                text={firstName}
-                onChangeText={setFirstName}
-                showError={!!errors['firstName']}
-                errorMessage={errors['firstName']}
-            />
-            <Input
-                disabled={loading}
-                placeholder={"Last name"}
-                showError={!!errors['lastName']}
-                errorMessage={errors['lastName']}
-                text={lastName}
-                onChangeText={setLastName}
-            />
-            <Input
-                disabled={loading}
-                placeholder={"User name"}
-                showError={!!errors['username']}
-                errorMessage={errors['username']}
-                text={username}
-                onChangeText={setUserName}
-            />
-            <LinearButton onPress={onSubmit} disabled={loading || loadingImage}>
-                {loading ? <ActivityIndicator /> : <Text style={style.button_white_text}>Sign up</Text>}
-            </LinearButton>
-        </View>
+        </ScrollView>
     );
 }
 

@@ -22,7 +22,7 @@ const ImagePicker = ({
             mediaType: 'photo',
             maxHeight: 1000,
             maxWidth: 1000,
-            quality: 0.1
+            quality: 0.5
         }, res => {
             if (!res.didCancel) {
                 const source = {
@@ -45,7 +45,7 @@ const ImagePicker = ({
             maxHeight: 1000,
             maxWidth: 1000,
             mediaType: 'photo',
-            quality: 0.1,
+            quality: 0.5,
             cameraType: 'back',
             saveToPhotos: true,
         }, res => {

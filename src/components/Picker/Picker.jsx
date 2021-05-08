@@ -12,8 +12,8 @@ const DropdownArrow = () => (
 );
 
 export const Picker = ({
-    onOpen,
-    onClose,
+    onOpen = () => { },
+    onClose = () => { },
     placeholder = {},
     onValueChange,
     items,

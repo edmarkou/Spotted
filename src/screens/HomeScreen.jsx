@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { makeAuthRequest } from '../helpers/fetch';
 import style from '../styles/global';
 import { updateAuthorization } from '../actions/userActions';
-import MapView, { Marker, Callout, Circle } from 'react-native-maps';
+import MapView, { Marker, Callout, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import { getLocation, getDistanceBetween } from '../helpers/locationHelper';
 import SpotCallout from '../components/SpotCallout';
 import BottomHalfModal from '../components/BottomHalfModal';
@@ -109,10 +109,15 @@ const HomeScreen = ({
         <View style={style.home_container}>
             {currLocation &&
                 <MapView
+                    // provider={PROVIDER_GOOGLE}
                     style={style.map}
                     initialRegion={currLocation}
                     showsUserLocation
                     onUserLocationChange={onUserLocationChange}
+                    userLocationCalloutEnabled={false}
+                    showsIndoors={false}
+                    showsCompass={true}
+                    pitchEnabled={false}
                     onPress={openSpotCreation}
                 >
                     {spots.map((spot, i) => (

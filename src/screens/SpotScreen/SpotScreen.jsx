@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, ActivityIndicator } from 'react-native';
 import useSpotSocket from '../../context/useSpotSocket';
-import { makeAuthRequest } from '../../helpers/fetch';
+import { updateAuthorization } from '../../actions/userActions';
 import { connect } from 'react-redux';
 import global from '../../styles/global';
 import LinearButton from '../../components/LinearButton';
 import style from './style';
 import { getDistanceBetween, getLocation } from '../../helpers/locationHelper';
+import { UserListItem } from '../../components/UserListItem/UserListItem';
 
 const Spot = ({
     updateAuthorization,
@@ -15,14 +16,21 @@ const Spot = ({
     user
 }) => {
     const [location, setLocation] = useState(null);
+
+    const onUserDataChange = (user) => {
+        updateAuthorization(true, user);
+    };
+
     const [spot, joinSession, leaveSession] = useSpotSocket({
         spotId: route.params._id,
         user: {
             _id: user._id,
             firstName: user.firstName,
             username: user.username,
-            image: user.image
-        }
+            image: user.image,
+            inSession: user.inSession
+        },
+        onUserDataChange
     });
 
     useEffect(() => {
@@ -74,8 +82,6 @@ const Spot = ({
                 <Text style={style.regular_text}>{spot.size}</Text>
                 <Text style={style.topic_text}>Spot type</Text>
                 <Text style={style.regular_text}>{spot.type}</Text>
-                <Text style={style.topic_text}>Users at spot</Text>
-                <Text style={style.regular_text}>{spot.usersAtSpot.length}</Text>
                 {canJoin() && !isJoined() &&
                     <LinearButton onPress={joinSession}>
                         <Text style={global.button_white_text}>Join session</Text>
@@ -84,6 +90,12 @@ const Spot = ({
                     <LinearButton onPress={leaveSession}>
                         <Text style={global.button_white_text}>Leave session</Text>
                     </LinearButton>}
+                <View style={style.userSpotContainer}>
+                    <Text style={style.topic_text}>Users at spot</Text>
+                    {spot.usersAtSpot.filter(u => u._id !== user._id).map((u, i) => (
+                        <UserListItem key={i} user={u} onPress={() => navigation.navigate('UserInfo', { _id: u._id })} />
+                    ))}
+                </View>
             </ScrollView>
         </View>
     );
@@ -93,5 +105,9 @@ const mapStateToProps = ({ user }) => ({
     user
 });
 
-const SpotScreen = connect(mapStateToProps)(Spot);
+const mapDispatchToProps = dispatch => ({
+    updateAuthorization: (bool, extraData) => dispatch(updateAuthorization(bool, extraData))
+});
+
+const SpotScreen = connect(mapStateToProps, mapDispatchToProps)(Spot);
 export { SpotScreen };

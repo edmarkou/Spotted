@@ -15,6 +15,7 @@ import Logo from '../components/Logo';
 import UserHeaderTitle from '../components/UserHeaderTitle';
 import BackButton from '../components/BackButton';
 import TabBar from '../components/TabBar';
+import UserInfo from '../screens/UserInfo';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,6 +62,7 @@ const Router = ({
           <>
             <Stack.Screen options={props => getHeaderOptions({ ...props, user })} name="TabScreens" component={TabScreens} />
             <Stack.Screen options={props => getHeaderOptions({ ...props, user })} name="Spot" component={SpotScreen} />
+            <Stack.Screen options={props => getHeaderOptions({ ...props, user })} name="UserInfo" component={UserInfo} />
           </>
           :
           <>

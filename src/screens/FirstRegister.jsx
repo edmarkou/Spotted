@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react/cjs/react.development';
 import Input from '../components/Input';
 import { makeRequest } from '../helpers/fetch';
@@ -46,40 +46,44 @@ const FirstRegister = ({
     }
 
     return (
-        <View style={style.flex_center}>
-            <Input
-                disabled={loading}
-                placeholder={"Email address"}
-                text={email}
-                onChangeText={setEmail}
-                showError={!!errors['email']}
-                errorMessage={errors['email']}
-            />
-            <Input
-                disabled={loading}
-                placeholder={"Password"}
-                showError={!!errors['pass']}
-                errorMessage={errors['pass']}
-                secureTextEntry={true}
-                text={pass}
-                onChangeText={setPass}
-            />
-            <Input
-                disabled={loading}
-                placeholder={"Repeat password"}
-                showError={!!errors['repeatPass']}
-                errorMessage={errors['repeatPass']}
-                secureTextEntry={true}
-                text={repeatPass}
-                onChangeText={setRepeatPass}
-            />
-            <LinearButton
-                onPress={onSubmit}
-                disabled={loading}
-            >
-                {loading ? <ActivityIndicator /> : <Text style={style.button_white_text}>Next</Text>}
-            </LinearButton>
-        </View>
+        <ScrollView contentContainerStyle={style.scrolview_flex_all}>
+            <View style={style.flex_center}>
+                <KeyboardAvoidingView style={style.keyboard_avoiding_view} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+                    <Input
+                        disabled={loading}
+                        placeholder={"Email address"}
+                        text={email}
+                        onChangeText={setEmail}
+                        showError={!!errors['email']}
+                        errorMessage={errors['email']}
+                    />
+                    <Input
+                        disabled={loading}
+                        placeholder={"Password"}
+                        showError={!!errors['pass']}
+                        errorMessage={errors['pass']}
+                        secureTextEntry={true}
+                        text={pass}
+                        onChangeText={setPass}
+                    />
+                    <Input
+                        disabled={loading}
+                        placeholder={"Repeat password"}
+                        showError={!!errors['repeatPass']}
+                        errorMessage={errors['repeatPass']}
+                        secureTextEntry={true}
+                        text={repeatPass}
+                        onChangeText={setRepeatPass}
+                    />
+                    <LinearButton
+                        onPress={onSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? <ActivityIndicator /> : <Text style={style.button_white_text}>Next</Text>}
+                    </LinearButton>
+                </KeyboardAvoidingView>
+            </View>
+        </ScrollView>
     );
 }
 

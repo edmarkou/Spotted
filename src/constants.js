@@ -11,3 +11,17 @@ export const SIZE_TYPES = [
     { label: 'Small (50m)', value: 'SMALL', key: 'SMALL' },
     { label: 'Large (200m)', value: 'LARGE', key: 'LARGE' },
 ];
+
+export const USER_TYPES = [
+    { label: 'BMX', value: 'BMX', key: 'BMX' },
+    { label: 'Skate', value: 'SKATE', key: 'SKATE' },
+    { label: 'Scooter', value: 'SCOOTER', key: 'SCOOTER' },
+    { label: 'Blades', value: 'BLADES', key: 'BLADES' },
+];
+
+export const RIDER_TYPE = {
+    BMX: 'BMX rider',
+    SKATE: 'Skater',
+    BLADES: 'Blader',
+    SCOOTER: 'Scooter'
+};
